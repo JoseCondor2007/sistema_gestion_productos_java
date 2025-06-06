@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.table.DefaultTableModel;
 import pe.edu.vallegrande.controller.ProductoController;
-import com.toedter.calendar.JDateChooser; // Importar JDateChooser
+import com.toedter.calendar.JDateChooser;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -38,7 +38,6 @@ public class RegistroProductoView extends JFrame implements ActionListener {
     }
 
     private void inicializarComponentes() {
-        // Inicialización de etiquetas, campos de texto, etc. (igual que antes)
         lblNombreProducto = new JLabel("Nombre del producto:");
         lblTipoProducto = new JLabel("Tipo de producto:");
         lblMarca = new JLabel("Marca:");
@@ -69,6 +68,7 @@ public class RegistroProductoView extends JFrame implements ActionListener {
         btnModificar = new JButton("Modificar");
         btnEliminar = new JButton("Eliminar");
 
+        // Los nombres de las columnas son importantes y deben coincidir con el orden que luego se carga
         tableModel = new DefaultTableModel(new Object[]{"ID", "Nombre", "Tipo", "Marca", "Precio", "¿En Stock?", "Stock", "Fecha Registro"}, 0);
         tablaProductos = new JTable(tableModel);
         scrollPaneTabla = new JScrollPane(tablaProductos);
@@ -77,27 +77,26 @@ public class RegistroProductoView extends JFrame implements ActionListener {
         // Inicializar JDateChooser
         dateChooser = new JDateChooser();
         dateChooser.setPreferredSize(new Dimension(120, dateChooser.getPreferredSize().height));
+        // Opcional: configurar el formato de visualización del JDateChooser (solo para mostrar en el calendario)
+        // dateChooser.setDateFormatString("dd-MM-yyyy"); // Esto es solo visual, no afecta el getDate()
 
         // Cargar y asignar imágenes a los botones, escalándolas
         try {
-            // Registrar button icon
             ImageIcon originalIconRegistrar = new ImageIcon(getClass().getResource("/img/registrar.png"));
             Image imageRegistrar = originalIconRegistrar.getImage();
-            Image scaledImageRegistrar = imageRegistrar.getScaledInstance(20, 20, Image.SCALE_SMOOTH); // Scale to 20x20
+            Image scaledImageRegistrar = imageRegistrar.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             ImageIcon iconRegistrar = new ImageIcon(scaledImageRegistrar);
             btnRegistrar.setIcon(iconRegistrar);
 
-            // Modificar button icon
             ImageIcon originalIconModificar = new ImageIcon(getClass().getResource("/img/modificar.png"));
             Image imageModificar = originalIconModificar.getImage();
-            Image scaledImageModificar = imageModificar.getScaledInstance(20, 20, Image.SCALE_SMOOTH); // Scale to 20x20
+            Image scaledImageModificar = imageModificar.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             ImageIcon iconModificar = new ImageIcon(scaledImageModificar);
             btnModificar.setIcon(iconModificar);
 
-            // Eliminar button icon
             ImageIcon originalIconEliminar = new ImageIcon(getClass().getResource("/img/eliminar.png"));
             Image imageEliminar = originalIconEliminar.getImage();
-            Image scaledImageEliminar = imageEliminar.getScaledInstance(20, 20, Image.SCALE_SMOOTH); // Scale to 20x20
+            Image scaledImageEliminar = imageEliminar.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
             ImageIcon iconEliminar = new ImageIcon(scaledImageEliminar);
             btnEliminar.setIcon(iconEliminar);
 
@@ -106,15 +105,9 @@ public class RegistroProductoView extends JFrame implements ActionListener {
             e.printStackTrace();
         }
 
-        // Asignar colores suaves a los botones
-        // Soft Green for Registrar
-        btnRegistrar.setBackground(new Color(144, 238, 144)); // Light Green
-
-        // Soft Yellow for Modificar
-        btnModificar.setBackground(new Color(255, 255, 153)); // Light Yellow
-
-        // Soft Red for Eliminar
-        btnEliminar.setBackground(new Color(255, 153, 153)); // Light Red
+        btnRegistrar.setBackground(new Color(144, 238, 144));
+        btnModificar.setBackground(new Color(255, 255, 153));
+        btnEliminar.setBackground(new Color(255, 153, 153));
     }
 
     private void configurarVentana() {
@@ -144,7 +137,6 @@ public class RegistroProductoView extends JFrame implements ActionListener {
         gbcRegistro.anchor = GridBagConstraints.WEST;
         gbcRegistro.fill = GridBagConstraints.HORIZONTAL;
 
-        // Organizar componentes en el panel de registro
         gbcRegistro.gridx = 0;
         gbcRegistro.gridy = 0;
         panelRegistro.add(lblNombreProducto, gbcRegistro);
@@ -215,14 +207,12 @@ public class RegistroProductoView extends JFrame implements ActionListener {
         gbcRegistro.fill = GridBagConstraints.NONE;
         panelRegistro.add(panelBotones, gbcRegistro);
 
-        // Agregar el panel de registro al frame principal
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(panelRegistro, gbc);
 
-        // Tabla de productos
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weighty = 1.0;
@@ -278,10 +268,14 @@ public class RegistroProductoView extends JFrame implements ActionListener {
         txtNombreProducto.setText("");
         txtMarca.setText("");
         txtPrecio.setText("");
+        cmbTipoProducto.setSelectedIndex(0); // Restablecer el combobox
         chkNoStock.setSelected(true);
         spnStock.setValue(0);
+        spnStock.setEnabled(false); // Deshabilitar spinner por defecto
         dateChooser.setDate(null);  // Limpiar el JDateChooser
+        tablaProductos.clearSelection(); // Limpiar la selección de la tabla
     }
+
 
     public void cargarDatosProductoSeleccionado() {
         int filaSeleccionada = tablaProductos.getSelectedRow();
@@ -290,17 +284,26 @@ public class RegistroProductoView extends JFrame implements ActionListener {
             cmbTipoProducto.setSelectedItem(tablaProductos.getValueAt(filaSeleccionada, 2).toString());
             txtMarca.setText(tablaProductos.getValueAt(filaSeleccionada, 3).toString());
             txtPrecio.setText(tablaProductos.getValueAt(filaSeleccionada, 4).toString());
-            chkSiStock.setSelected(tablaProductos.getValueAt(filaSeleccionada, 5).toString().equals("Sí"));
-            chkNoStock.setSelected(!chkSiStock.isSelected());
+
+            // Checkbox de stock
+            boolean enStock = tablaProductos.getValueAt(filaSeleccionada, 5).toString().equals("Sí");
+            chkSiStock.setSelected(enStock);
+            chkNoStock.setSelected(!enStock);
+            spnStock.setEnabled(enStock); // Habilitar/deshabilitar spinner según stock
+
             spnStock.setValue(Integer.parseInt(tablaProductos.getValueAt(filaSeleccionada, 6).toString()));
 
             // Cargar la fecha en el JDateChooser
             try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = sdf.parse(tablaProductos.getValueAt(filaSeleccionada, 7).toString());
+                // El formato de la tabla es "dd-MM-yyyy", así que parseamos con ese formato
+                SimpleDateFormat sdfTabla = new SimpleDateFormat("dd-MM-yyyy");
+                String fechaTablaStr = tablaProductos.getValueAt(filaSeleccionada, 7).toString();
+                Date date = sdfTabla.parse(fechaTablaStr);
                 dateChooser.setDate(date);
-            } catch (ParseException | NullPointerException e) {
-                dateChooser.setDate(null); // Limpiar si hay error o la fecha es nula
+            } catch (ParseException | NullPointerException | ClassCastException e) {
+                // Manejo de errores: si la fecha no se puede parsear o es nula, limpia el JDateChooser
+                System.err.println("Error al cargar la fecha en el JDateChooser: " + e.getMessage());
+                dateChooser.setDate(null);
             }
         }
     }
@@ -319,10 +322,12 @@ public class RegistroProductoView extends JFrame implements ActionListener {
     public JSpinner getSpnStock() { return spnStock; }
     public JTable getTablaProductos() { return tablaProductos; }
 
+    // Metodo corregido: Ahora devuelve el formato "dd-MM-yyyy" que espera el controlador
     public String getTxtFechaRegistro() {
         Date date = dateChooser.getDate();
         if (date != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            // Usa el mismo formato que el controlador espera para la entrada de la vista
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
             return sdf.format(date);
         } else {
             return "";
